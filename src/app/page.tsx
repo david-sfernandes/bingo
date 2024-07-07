@@ -1,22 +1,33 @@
 "use client";
-import Card from "@/components/Card";
-import UpdateBtn from "@/components/UpdateBtn";
+import EmailLogin from "@/components/EmailLogin";
+import VerifyLoginLink from "@/components/VerifyLoginLink";
 import useBingoStore from "@/store/state";
+import generateNumbers from "@/utils/generateNumbers";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
-  const { bingoNumbers } = useBingoStore();
+  const { setBingoNumbers } = useBingoStore();
+  const route = useRouter();
+
+  const updateNumbers = () => {
+    setBingoNumbers(generateNumbers(10, 99));
+    route.push("/local");
+  };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-slate-900">
-      <section className="flex flex-col">
-        <div className="flex p-1">
-          <h1 className="font-extrabold text-3xl text-center mb-3 mx-auto">
-            Bingo
-          </h1>
-          <UpdateBtn />
-        </div>
-        <Card numbers={bingoNumbers} />
-      </section>
-    </main>
+    <>
+      <EmailLogin />
+      <VerifyLoginLink />
+
+      <div className="w-full border-b border-b-gray-400 my-4" />
+
+      <p className="text-lg">Jogar sem conta</p>
+      <p className="text-gray-500 text-sm mb-2">
+        Seu progresso ficará salvo localmente
+      </p>
+      <button onClick={updateNumbers} className="btn-green">
+        Gerar cartela
+      </button>
+    </>
   );
 }

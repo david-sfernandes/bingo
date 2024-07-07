@@ -11,8 +11,8 @@ export default function UpdateBtn() {
   };
 
   return (
-    <button onClick={updateNumbers} className="text-slate-500 p-1">
-      <ArrowPathIcon className="h-7 w-7"/>
+    <button onClick={updateNumbers} className="text-white p-1">
+      <ArrowPathIcon className="h-8 w-8"/>
     </button>
   );
 }

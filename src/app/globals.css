@@ -16,18 +16,49 @@
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}
-
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  body {
+    @apply !bg-gradient-radial from-[#5552B8] to-[#413e94];
+  }
+
+  main {
+    background-image: url("/Bg.png");
+    background-size: 80px 120px;
+    background-repeat: repeat;
+    backdrop-filter: opacity(0.1);
+    animation: bgmove 60s infinite linear;
+  }
+
+  .bg-grad-orange {
+    @apply bg-gradient-to-b from-[#E68E40] to-[#D87B42];
+  }
+
+  .btn-default {
+    @apply my-1 w-full text-center text-white border-4 px-4 py-2 font-medium text-lg rounded-2xl mx-auto hover:shadow-lg transition-shadow duration-300 ease-in-out;
+  }
+
+  .btn-green {
+    @apply btn-default bg-green-500 border-green-300;
+  }
+
+  .btn-orange {
+    @apply btn-default bg-grad-orange border-orange-200;
+  }
+
+  .input-default {
+    @apply px-2 py-1 border border-zinc-400 w-full rounded-lg my-1 focus:outline-indigo-600;
+  }
+
+  .divider {
+    @apply w-full border-b border-b-gray-400 my-4;
+  }
+
+  @keyframes bgmove {
+    0% {
+      background-position: 0 0;
+    }
+    50% {
+      background-position: 100% 100%;
+    }
   }
 }

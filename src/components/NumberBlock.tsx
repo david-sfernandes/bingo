@@ -1,35 +1,35 @@
 "use client";
 import useBingoStore from "@/store/state";
+import { Checkbox } from "@headlessui/react";
 import { useState } from "react";
 
-export default function NumberBlock({ bingoNum }: { bingoNum: BingoNum }) {
-  const { setBingoNumbers, bingoNumbers } = useBingoStore();
-
-  const handleClick = () => {
-    const newNumbers = bingoNumbers.map((item) =>
-      item.num == bingoNum.num
-        ? { num: item.num, selected: !item.selected }
-        : item
-    );
-    setBingoNumbers(newNumbers);
-  };
+export default function NumberBlock({
+  bingoNum,
+  isSelected,
+  handleClick,
+}: {
+  bingoNum: number;
+  isSelected: boolean;
+  handleClick: () => void;
+}) {
+  const [isChecked, setIsChecked] = useState(isSelected);
 
   return (
-    <div
-      className="border border-gray-400/80 p-4 cursor-pointer"
-      onClick={handleClick}
+    <Checkbox
+      defaultChecked={isChecked}
+      className="group flex justify-center items-center cursor-pointer bg-white size-20"
+      onClick={() => {
+        setIsChecked(!isChecked);
+        handleClick();
+      }}
     >
-      <div
-        className={`relative text-4xl font-medium text-center rounded-full p-2 text-zinc-950
-        before:content-[''] before:absolute before:inset-0 before:rounded-full isolate before:bg-green-500/90
-        before:transition-transform before:scale-0 before:transform before:-z-10 before:m-auto before:h-14 before:w-14
-        ${
-          bingoNum.selected &&
-          " before:scale-100 before:transform before:transition-transform"
-        }`}
+      <p
+        className={`relative text-4xl font-medium text-center rounded-full p-2 text-zinc-950 isolate size-14
+          transition-all duration-200 ease-in-out 
+          group-data-[checked]:bg-orange-500 group-data-[checked]:text-white group-data-[checked]:shadow-lg group-data-[checked]:scale-105"}`}
       >
-        {bingoNum.num}
-      </div>
-    </div>
+        {bingoNum}
+      </p>
+    </Checkbox>
   );
 }
