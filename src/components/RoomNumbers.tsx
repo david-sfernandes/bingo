@@ -1,6 +1,7 @@
 "use client";
 import {
   collection,
+  doc,
   DocumentData,
   DocumentReference,
   getDocs,
@@ -34,24 +35,37 @@ export default function RoomNumbers() {
     setRef(snapshot.docs[0].ref);
   };
 
-  onSnapshot(roomQuery, (snapshot) => {
-    setNumbers(snapshot.docs[0].data().numbers);
-  });
+  // onSnapshot(roomQuery, (snapshot) => {
+  //   setNumbers(snapshot.docs[0].data().numbers);
+  // });
 
   useEffect(() => {
     getRef();
   }, [id]);
 
+  useEffect(() => {
+    if (!ref) return;
+
+    const unsubscribe = onSnapshot(ref, (doc) => {
+      if (doc.exists()) {
+        setNumbers(doc.data().numbers || []);
+      }
+    });
+
+    // Clean up listener on component unmount
+    return () => unsubscribe();
+  }, [ref]);
+
   const postNumber = async () => {
     if (!ref) return;
-    await updateDoc(ref, { numbers: [...numbers, numToPost] });
+    updateDoc(ref, { numbers: [...numbers, numToPost] });
   };
 
   return (
-    <section className="h-1/2 bg-white rounded-r-2xl absolute left-0 inset-y-0 my-auto w-[70px] py-1 px-2 flex flex-col items-center border-b-4 border-gray-400 shadow-md">
-      <div className="flex-1 flex flex-col gap-1 pt-1">
+    <section className="h-[410px] bg-white rounded-r-2xl absolute left-0 inset-y-0 my-auto w-[72px] py-1 px-2 items-center border-b-4 border-gray-400 shadow-md grid grid-rows-[300px_100px]">
+      <div className="pt-1 overflow-y-scroll h-[300px]">
         {numbers.map((num) => (
-          <p className="text-center font-bold mx-1 text-xl size-9 bg-orange-500 text-white rounded-full flex justify-center items-center">
+          <p className="text-center mt-1 font-bold mx-1 text-xl size-9 bg-orange-500 text-white rounded-full flex justify-center items-center">
             {num}
           </p>
         ))}

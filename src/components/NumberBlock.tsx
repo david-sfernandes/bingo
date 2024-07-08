@@ -1,5 +1,4 @@
 "use client";
-import useBingoStore from "@/store/state";
 import { Checkbox } from "@headlessui/react";
 import { useState } from "react";
 

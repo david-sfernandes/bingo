@@ -1,46 +1,36 @@
+"use client";
 import useBingoStore from "@/store/state";
 import generateNumbers from "@/utils/generateNumbers";
 import { Button } from "@headlessui/react";
 import NumberBlock from "./NumberBlock";
 
-import actionCodeSettings from "@/config/actionCodeSettings ";
-import { getAuth, sendSignInLinkToEmail } from "firebase/auth";
 import Link from "next/link";
-import { useState } from "react";
 
-export default function Card({ numbers }: { numbers: number[] }) {
-  const { setBingoNumbers } = useBingoStore();
-  const auth = getAuth();
-  const [email, setEmail] = useState("");
-
-  const loginWithEmail = () => {
-    sendSignInLinkToEmail(auth, email, actionCodeSettings)
-      .then(() => {
-        window.localStorage.setItem("emailForSignIn", email);
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.error(errorCode, errorMessage);
-      });
-  };
+export default function Card() {
+  const { setBingoNumbers, bingoNumbers, setSelectedNumbers, selectedNumbers } =
+    useBingoStore();
 
   const updateNumbers = () => {
     setBingoNumbers(generateNumbers(10, 99));
   };
 
-  const endGame = () => {
-    setBingoNumbers([]);
-  };
-
-  const selectCount = numbers.filter((num) => false).length;
-  if (selectCount == 16) {
+  if (selectedNumbers.length == 16) {
     alert("Bingo!");
   }
 
+  const handleNumberClick = (num: number) => {
+    if (selectedNumbers.includes(num)) {
+      setSelectedNumbers(selectedNumbers.filter((n) => n !== num));
+    } else {
+      setSelectedNumbers([...selectedNumbers, num]);
+    }
+  };
+
+  console.log(bingoNumbers);
+
   return (
     <div className="flex flex-col justify-center bg-white">
-      {numbers.length == 0 && (
+      {bingoNumbers.length == 0 && (
         <>
           <Button className="btn-green" onClick={updateNumbers}>
             Gerar cartela
@@ -50,14 +40,19 @@ export default function Card({ numbers }: { numbers: number[] }) {
           </Link>
         </>
       )}
-      {numbers.length > 0 && (
+      {bingoNumbers.length > 0 && (
         <>
           <p className="text-center text-gray-700 text-lg mb-1">
-            {selectCount}/{numbers.length}
+            {selectedNumbers.length}/{bingoNumbers.length}
           </p>
           <div className="border rounded-2xl overflow-hidden border-gray-400/80 grid grid-cols-4 grid-rows-4 gap-[2px] bg-gray-400/80 w-fit mx-auto">
-            {numbers.map((num) => (
-              <NumberBlock bingoNum={num} />
+            {bingoNumbers.map((num) => (
+              <NumberBlock
+                bingoNum={num}
+                isSelected={selectedNumbers.includes(num)}
+                handleClick={() => handleNumberClick(num)}
+                key={`n-${num}`}
+              />
             ))}
           </div>
           <Link href="/" className="btn-orange !mt-2">

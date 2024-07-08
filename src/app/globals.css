@@ -52,6 +52,18 @@
   .divider {
     @apply w-full border-b border-b-gray-400 my-4;
   }
+  
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-orange-400/90 rounded-full ;
+  }
 
   @keyframes bgmove {
     0% {

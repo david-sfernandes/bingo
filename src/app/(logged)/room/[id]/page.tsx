@@ -10,7 +10,6 @@ import {
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { auth, db } from "../../../../../firebaseConfig";
-import RoomNumbers from "@/components/RoomNumbers";
 
 export default function RoomPage({ params }: { params: { id: number } }) {
   const id = +params.id;
