@@ -3,16 +3,11 @@ import { auth } from "../../firebaseConfig";
 
 import useBingoStore from "@/store/state";
 import { ArrowLeftEndOnRectangleIcon } from "@heroicons/react/24/outline";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
   const { email } = useBingoStore((state) => state);
-  const pathname = usePathname();
   const route = useRouter();
-
-  if (auth.currentUser) {
-    if (pathname === "/") route.push("/room");
-  }
 
   if (!auth.currentUser?.email) return null;
 
@@ -23,10 +18,13 @@ export default function Header() {
         <p className="text-sm text-zinc-800">{email}</p>
       </div>
 
-      <button className="btn-default bg-grad-orange !w-16 !m-0" onClick={() => {
-        auth.signOut();
-        route.push("/");
-      }}>
+      <button
+        className="btn-default bg-grad-orange !w-16 !m-0"
+        onClick={() => {
+          auth.signOut();
+          route.push("/");
+        }}
+      >
         <ArrowLeftEndOnRectangleIcon className="text-white h-6 w-6" />
       </button>
     </header>

@@ -1,60 +1,37 @@
 "use client";
+import { Input } from "@headlessui/react";
+import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
 import {
   collection,
-  doc,
-  DocumentData,
-  DocumentReference,
   getDocs,
   onSnapshot,
   query,
   updateDoc,
   where,
 } from "firebase/firestore";
-import { useParams } from "next/navigation";
-import { db } from "../../firebaseConfig";
 import { useEffect, useState } from "react";
-import { Input } from "@headlessui/react";
-import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
+import { db } from "../../firebaseConfig";
 
-export default function RoomNumbers() {
+export default function RoomNumbers({ id }: { id: number }) {
   const [numbers, setNumbers] = useState<number[]>([]);
-  const [ref, setRef] = useState<DocumentReference<
-    DocumentData,
-    DocumentData
-  > | null>(null);
+  const [ref, setRef] = useState<DocRef | null>(null);
   const [numToPost, setNumToPost] = useState<number>();
-
-  const { id } = useParams<{ id: string }>();
-  if (!id) return null;
 
   const roomsRef = collection(db, "rooms");
   const roomQuery = query(roomsRef, where("roomId", "==", +id));
 
-  const getRef = async () => {
-    const snapshot = await getDocs(roomQuery);
-    setRef(snapshot.docs[0].ref);
-  };
-
-  // onSnapshot(roomQuery, (snapshot) => {
-  //   setNumbers(snapshot.docs[0].data().numbers);
-  // });
-
   useEffect(() => {
-    getRef();
-  }, [id]);
+    const getNumbers = async () => {
+      const snapshot = await getDocs(roomQuery);
+      const docRef = snapshot.docs[0].ref;
+      setRef(docRef);
+      onSnapshot(docRef, (doc: DocRef) => {
+        setNumbers(doc.data().numbers);
+      });
+    };
 
-  useEffect(() => {
-    if (!ref) return;
-
-    const unsubscribe = onSnapshot(ref, (doc) => {
-      if (doc.exists()) {
-        setNumbers(doc.data().numbers || []);
-      }
-    });
-
-    // Clean up listener on component unmount
-    return () => unsubscribe();
-  }, [ref]);
+    getNumbers();
+  }, []);
 
   const postNumber = async () => {
     if (!ref) return;

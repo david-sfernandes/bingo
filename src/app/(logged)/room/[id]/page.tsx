@@ -4,6 +4,7 @@ import {
   collection,
   DocumentData,
   getDocs,
+  Query,
   query,
   QueryDocumentSnapshot,
   where,
@@ -11,51 +12,53 @@ import {
 import { useEffect, useState } from "react";
 import { auth, db } from "../../../../../firebaseConfig";
 
+type DocSnap = QueryDocumentSnapshot<DocumentData>;
+
 export default function RoomPage({ params }: { params: { id: number } }) {
   const id = +params.id;
-  const [roomDoc, setRoomDoc] =
-    useState<QueryDocumentSnapshot<DocumentData> | null>(null);
-  const [userDoc, setUserDoc] =
-    useState<QueryDocumentSnapshot<DocumentData> | null>(null);
+  const [userDoc, setUserDoc] = useState<DocSnap | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState("");
 
-  const getRoomDoc = () => {
-    let roomsRef = collection(db, "rooms");
-    const roomQuery = query(roomsRef, where("roomId", "==", id));
-    getDocs(roomQuery).then((snapshot) => {
-      if (!snapshot.empty) {
-        setRoomDoc(snapshot.docs[0]);
-      }
-    });
+  const usersCol = collection(db, "users");
+
+  const getUserDoc = (userQuery: Query<DocumentData, DocumentData>) => {
+    if (!auth.currentUser?.uid || !id) {
+      setMessage("Você não está logado!");
+      return;
+    }
+
+    getDocs(userQuery)
+      .then((doc) => {
+        if (!doc.empty) setUserDoc(doc.docs[0]);
+        else setMessage("Não encontramos seus dados nesta sala!");
+      })
   };
 
-  const getUserDoc = () => {
-    const userDoc = collection(db, "users");
-    const userQuery = query(
-      userDoc,
+  useEffect(() => {
+    if (!auth.currentUser) return;
+    let userQuery = query(
+      usersCol,
       where("userId", "==", auth.currentUser?.uid),
       where("roomId", "==", id)
     );
-    getDocs(userQuery).then((snapshot) => {
-      if (!snapshot.empty) setUserDoc(snapshot.docs[0]);
-    });
-  };
+    getUserDoc(userQuery);
+  }, [loading]);
 
-  const isPlayerInRoom = () => {
-    if (!auth.currentUser || !roomDoc) return;
-    const data = roomDoc.data();
-    return data.players.includes(auth.currentUser.email);
-  };
+  auth.authStateReady().then(() => setLoading(false));
 
-  useEffect(() => getRoomDoc(), []);
-  useEffect(() => {
-    if (roomDoc && isPlayerInRoom()) getUserDoc();
-  }, [roomDoc]);
+  if (loading) {
+    return <p>loading...</p>;
+  }
 
-  if (!userDoc && !roomDoc) return null;
+  if (!userDoc || !auth.currentUser?.uid || !id)
+    return (
+      <div>
+        <h3 className="font-medium text-lg">Não ao carregar dados!</h3>
+        <p>{message}</p>
+      </div>
+    );
+
   console.log("render page");
-  return (
-    <>
-      <CardWithAccount userDoc={userDoc} />
-    </>
-  );
+  return <CardWithAccount userDoc={userDoc} />;
 }

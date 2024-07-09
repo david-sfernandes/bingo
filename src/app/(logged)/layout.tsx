@@ -4,9 +4,12 @@ import React, { ReactNode } from "react";
 
 type LayoutProps = {
   children: ReactNode;
+  params: {
+    id: number;
+  }
 };
 
-const Layout = ({ children }: LayoutProps) => {
+const Layout = ({ children, params }: LayoutProps) => {
   return (
     <>
       <Header />
@@ -19,7 +22,7 @@ const Layout = ({ children }: LayoutProps) => {
           </div>
           <div className="p-2">{children}</div>
         </section>
-        <RoomNumbers />
+        {params.id && <RoomNumbers id={params.id} />}
       </main>
     </>
   );
